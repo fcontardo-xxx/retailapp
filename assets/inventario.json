@@ -1,0 +1,18 @@
+[
+  {
+    "id": "SP001",
+    "nombre": "Polo",
+    "categoria": "Ropa",
+    "linea": "Hombre",
+    "colores": ["Roja", "Blanca", "Negra", "Azul"],
+    "tallas": ["XL", "L", "M", "S"]
+  },
+  {
+    "id": "SP002",
+    "nombre": "Blusa",
+    "categoria": "Ropa",
+    "linea": "Mujer",
+    "colores": ["Blanca", "Negra", "Rosa", "Verde"],
+    "tallas": ["XL", "L", "M", "S"]
+  }
+]
