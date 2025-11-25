@@ -1,5 +1,5 @@
-name: retail_app
-description: App de ventas offline
+name: smart_pyme
+description: App de ventas offline para pequeñas y medianas empresas
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -16,6 +16,7 @@ dependencies:
   open_filex: ^4.5.4
   csv: ^6.0.0
   uuid: ^4.5.0  # ✅ Para generar ID único
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -27,3 +28,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/inventario.json
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "S:/Descargas/Nuevo Logo Smart-Pyme/6.png"
+  image_path_android: "S:/Descargas/Nuevo Logo Smart-Pyme/6.png"
+  image_path_ios: "S:/Descargas/Nuevo Logo Smart-Pyme/6.png"

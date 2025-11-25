@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ventas Offline',
+      title: 'Smart-Pyme',
       theme: ThemeData(useMaterial3: true),
       home: const HomePage(),
     );
@@ -190,7 +190,11 @@ class _HomePageState extends State<HomePage> {
                 DropdownButtonFormField<String>(
                   initialValue: colorSeleccionado,
                   hint: const Text('Color (opcional)'),
-                  decoration: const InputDecoration(labelText: 'Color'),
+                  decoration: InputDecoration(
+                    labelText: 'Color',
+                    filled: true,
+                    fillColor: const Color(0xFF6A66E3),
+                  ),
                   items: [
                     const DropdownMenuItem<String>(value: null, child: Text('Ninguno')),
                     ...coloresDisponibles.map<DropdownMenuItem<String>>((c) {
@@ -210,7 +214,11 @@ class _HomePageState extends State<HomePage> {
                 DropdownButtonFormField<String>(
                   initialValue: tallaSeleccionada,
                   hint: const Text('Talla (opcional)'),
-                  decoration: const InputDecoration(labelText: 'Talla'),
+                  decoration: InputDecoration(
+                    labelText: 'Talla',
+                    filled: true,
+                    fillColor: const Color(0xFF6A66E3),
+                  ),
                   items: [
                     const DropdownMenuItem<String>(value: null, child: Text('Ninguna')),
                     ...tallasDisponibles.map<DropdownMenuItem<String>>((s) {
@@ -609,12 +617,26 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
 
-                          _dropdownConEtiquetaBlanca(
-                            label: 'Producto',
-                            value: selectedProduct,
-                            hint: '— Selecciona producto (opcional) —',
+                          DropdownButtonFormField<String>(
+                            initialValue: selectedProduct,
+                            hint: Text('Producto', style: const TextStyle(color: Colors.white70)),
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.white24),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Color(0xFF6A66E3),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                            dropdownColor: Colors.white,
+                            onChanged: (value) => _onProductoChanged(value, inventario),
                             items: [
-                              const DropdownMenuItem<String>(value: null, child: Text('— Ninguno —', style: TextStyle(color: Colors.black))),
+                              const DropdownMenuItem<String>(value: null, child: Text('Producto', style: TextStyle(color: Colors.black))),
                               ...inventario
                                   .where((p) => p['id'] != null && p['id'].toString().isNotEmpty)
                                   .map<DropdownMenuItem<String>>((p) {
@@ -627,19 +649,29 @@ class _HomePageState extends State<HomePage> {
                                 );
                               })
                             ],
-                            onChanged: (value) => _onProductoChanged(value, inventario),
                           ),
 
                           if (colors.isNotEmpty)
                             DropdownButtonFormField<String>(
                               initialValue: selectedColor,
-                              hint: const Text('Color (opcional)'),
-                              decoration: _inputDecoration(),
+                              hint: const Text('Color', style: TextStyle(color: Colors.white70)),
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.white24),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                filled: true,
+                                fillColor: Color(0xFF6A66E3),
+                              ),
                               style: const TextStyle(color: Colors.white),
                               dropdownColor: Colors.white,
                               onChanged: (value) => _onColorChanged(value, inventario),
                               items: [
-                                const DropdownMenuItem<String>(value: null, child: Text('— Ninguno —', style: TextStyle(color: Colors.black))),
+                                const DropdownMenuItem<String>(value: null, child: Text('Color', style: TextStyle(color: Colors.black))),
                                 ...colors.map<DropdownMenuItem<String>>((c) {
                                   return DropdownMenuItem<String>(
                                     value: c,
@@ -652,13 +684,24 @@ class _HomePageState extends State<HomePage> {
                           if (sizes.isNotEmpty)
                             DropdownButtonFormField<String>(
                               initialValue: selectedSize,
-                              hint: const Text('Talla (opcional)'),
-                              decoration: _inputDecoration(),
+                              hint: const Text('Talla', style: TextStyle(color: Colors.white70)),
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.white24),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                filled: true,
+                                fillColor: Color(0xFF6A66E3),
+                              ),
                               style: const TextStyle(color: Colors.white),
                               dropdownColor: Colors.white,
                               onChanged: (value) => setState(() => selectedSize = value),
                               items: [
-                                const DropdownMenuItem<String>(value: null, child: Text('— Ninguna —', style: TextStyle(color: Colors.black))),
+                                const DropdownMenuItem<String>(value: null, child: Text('Talla', style: TextStyle(color: Colors.black))),
                                 ...sizes.map<DropdownMenuItem<String>>((s) {
                                   return DropdownMenuItem<String>(
                                     value: s,
@@ -692,9 +735,9 @@ class _HomePageState extends State<HomePage> {
                           _dropdownConEtiquetaBlanca(
                             label: 'Sexo',
                             value: _sexoSeleccionado,
-                            hint: '— Selecciona —',
+                            hint: 'Sexo',
                             items: const [
-                              DropdownMenuItem<String>(value: null, child: Text('— Ninguno —', style: TextStyle(color: Colors.black))),
+                              DropdownMenuItem<String>(value: null, child: Text('Sexo', style: TextStyle(color: Colors.black))),
                               DropdownMenuItem<String>(value: 'Hombre', child: Text('Hombre', style: TextStyle(color: Colors.black))),
                               DropdownMenuItem<String>(value: 'Mujer', child: Text('Mujer', style: TextStyle(color: Colors.black))),
                             ],
@@ -705,9 +748,9 @@ class _HomePageState extends State<HomePage> {
                           _dropdownConEtiquetaBlanca(
                             label: 'Rango de Edad',
                             value: _rangoEdadSeleccionado,
-                            hint: '— Selecciona —',
+                            hint: 'Rango de Edad',
                             items: const [
-                              DropdownMenuItem<String>(value: null, child: Text('— Ninguno —', style: TextStyle(color: Colors.black))),
+                              DropdownMenuItem<String>(value: null, child: Text('Rango de Edad', style: TextStyle(color: Colors.black))),
                               DropdownMenuItem<String>(value: 'Menor de 18', child: Text('Menor de 18', style: TextStyle(color: Colors.black))),
                               DropdownMenuItem<String>(value: '18-25', child: Text('18-25', style: TextStyle(color: Colors.black))),
                               DropdownMenuItem<String>(value: '26-35', child: Text('26-35', style: TextStyle(color: Colors.black))),
@@ -722,9 +765,9 @@ class _HomePageState extends State<HomePage> {
                           _dropdownConEtiquetaBlanca(
                             label: 'Lugar de Residencia',
                             value: _lugarResidenciaSeleccionado,
-                            hint: '— Selecciona —',
+                            hint: 'Lugar de Residencia',
                             items: const [
-                              DropdownMenuItem<String>(value: null, child: Text('— Ninguno —', style: TextStyle(color: Colors.black))),
+                              DropdownMenuItem<String>(value: null, child: Text('Lugar de Residencia', style: TextStyle(color: Colors.black))),
                               DropdownMenuItem<String>(value: 'Isla de Maipo', child: Text('Isla de Maipo', style: TextStyle(color: Colors.black))),
                               DropdownMenuItem<String>(value: 'Provincia de Talagante', child: Text('Provincia de Talagante', style: TextStyle(color: Colors.black))),
                               DropdownMenuItem<String>(value: 'Santiago', child: Text('Santiago', style: TextStyle(color: Colors.black))),
@@ -779,8 +822,6 @@ class _HomePageState extends State<HomePage> {
       initialValue: value,
       hint: Text(hint, style: const TextStyle(color: Colors.white70)),
       decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.white24),
           borderRadius: BorderRadius.circular(12),
@@ -789,6 +830,8 @@ class _HomePageState extends State<HomePage> {
           borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
+        filled: true,
+        fillColor: Color(0xFF6A66E3),
       ),
       style: const TextStyle(color: Colors.white), // ✅ Texto blanco en campo
       dropdownColor: Colors.white, // ✅ Fondo blanco en menú
@@ -801,17 +844,9 @@ class _HomePageState extends State<HomePage> {
     return TextField(
       controller: controller,
       style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
+      decoration: _inputDecoration().copyWith(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white24),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
         hintStyle: const TextStyle(color: Colors.white54),
       ),
     );
@@ -828,6 +863,8 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(12),
       ),
       hintStyle: const TextStyle(color: Colors.white54),
+      filled: true,
+      fillColor: Color(0xFF6A66E3),
     );
   }
 }

@@ -1,5 +1,3 @@
-package com.example.retailapp
+// Legacy MainActivity removed after package rename to com.smartpyme.app
+// File left intentionally blank to avoid duplicate activity classes.
 
-import io.flutter.embedding.android.FlutterActivity
-
-class MainActivity : FlutterActivity()
