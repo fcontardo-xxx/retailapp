@@ -468,8 +468,8 @@ class _HomePageState extends State<HomePage> {
         final file = File(result.files.single.path!);
         final csv = await file.readAsString();
         
-        // Parsear el CSV
-        List<List<dynamic>> rows = const CsvToListConverter().convert(csv);
+        // Parsear el CSV usando ';' como separador de columnas
+        List<List<dynamic>> rows = const CsvToListConverter(fieldDelimiter: ';').convert(csv);
         
         if (rows.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -478,8 +478,10 @@ class _HomePageState extends State<HomePage> {
           return;
         }
 
-        // Obtener encabezados
-        List<String> headers = rows[0].map((e) => e.toString().toLowerCase()).toList();
+        // Obtener encabezados (trim + lowercase)
+        List<String> headers = rows[0]
+          .map((e) => e.toString().toLowerCase().trim())
+          .toList();
         
         // Validar que tenga las columnas necesarias
         final requiredColumns = ['id', 'nombre', 'categoria', 'linea', 'colores', 'tallas'];
@@ -503,22 +505,23 @@ class _HomePageState extends State<HomePage> {
           final coloresIndex = headers.indexOf('colores');
           final tallasIndex = headers.indexOf('tallas');
 
-          final producto = {
+            final producto = {
             'id': row[idIndex]?.toString() ?? '',
             'nombre': row[nombreIndex]?.toString() ?? '',
             'categoria': row[categoriaIndex]?.toString() ?? '',
             'linea': row[lineaIndex]?.toString() ?? '',
+            // Acepta separadores internos ',' o '|' dentro de la columna de colores/tallas
             'colores': (row[coloresIndex]?.toString() ?? '')
-                .split(',')
-                .map((c) => c.trim())
-                .where((c) => c.isNotEmpty)
-                .toList(),
+              .split(RegExp(r'[,|]'))
+              .map((c) => c.trim())
+              .where((c) => c.isNotEmpty)
+              .toList(),
             'tallas': (row[tallasIndex]?.toString() ?? '')
-                .split(',')
-                .map((t) => t.trim())
-                .where((t) => t.isNotEmpty)
-                .toList(),
-          };
+              .split(RegExp(r'[,|]'))
+              .map((t) => t.trim())
+              .where((t) => t.isNotEmpty)
+              .toList(),
+            };
 
           if (producto['id'].toString().isNotEmpty) {
             inventario.add(producto);
@@ -532,11 +535,14 @@ class _HomePageState extends State<HomePage> {
           return;
         }
 
-        // Guardar inventario en Hive
+        // Guardar inventario en Hive: limpiar inventario previo y guardar por id
         final tempBox = Hive.box('temp_productos');
         await tempBox.clear();
-        for (int i = 0; i < inventario.length; i++) {
-          await tempBox.put('inventario_$i', inventario[i]);
+        for (var producto in inventario) {
+          final id = (producto['id'] ?? '').toString();
+          if (id.isNotEmpty) {
+            await tempBox.put(id, producto);
+          }
         }
 
         // Recargar inventario
