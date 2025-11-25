@@ -435,6 +435,104 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _cargarInventarioCSV(BuildContext context) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+      );
+
+      if (result != null) {
+        final file = File(result.files.single.path!);
+        final csv = await file.readAsString();
+        
+        // Parsear el CSV
+        List<List<dynamic>> rows = const CsvToListConverter().convert(csv);
+        
+        if (rows.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('❌ El archivo CSV está vacío')),
+          );
+          return;
+        }
+
+        // Obtener encabezados
+        List<String> headers = rows[0].map((e) => e.toString().toLowerCase()).toList();
+        
+        // Validar que tenga las columnas necesarias
+        final requiredColumns = ['id', 'nombre', 'categoria', 'linea', 'colores', 'tallas'];
+        for (String col in requiredColumns) {
+          if (!headers.contains(col)) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('❌ Falta la columna: $col')),
+            );
+            return;
+          }
+        }
+
+        // Convertir filas a inventario
+        List<Map<String, dynamic>> inventario = [];
+        for (int i = 1; i < rows.length; i++) {
+          final row = rows[i];
+          final idIndex = headers.indexOf('id');
+          final nombreIndex = headers.indexOf('nombre');
+          final categoriaIndex = headers.indexOf('categoria');
+          final lineaIndex = headers.indexOf('linea');
+          final coloresIndex = headers.indexOf('colores');
+          final tallasIndex = headers.indexOf('tallas');
+
+          final producto = {
+            'id': row[idIndex]?.toString() ?? '',
+            'nombre': row[nombreIndex]?.toString() ?? '',
+            'categoria': row[categoriaIndex]?.toString() ?? '',
+            'linea': row[lineaIndex]?.toString() ?? '',
+            'colores': (row[coloresIndex]?.toString() ?? '')
+                .split(',')
+                .map((c) => c.trim())
+                .where((c) => c.isNotEmpty)
+                .toList(),
+            'tallas': (row[tallasIndex]?.toString() ?? '')
+                .split(',')
+                .map((t) => t.trim())
+                .where((t) => t.isNotEmpty)
+                .toList(),
+          };
+
+          if (producto['id'].toString().isNotEmpty) {
+            inventario.add(producto);
+          }
+        }
+
+        if (inventario.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('❌ No se encontraron productos válidos en el CSV')),
+          );
+          return;
+        }
+
+        // Guardar inventario en Hive
+        final tempBox = Hive.box('temp_productos');
+        await tempBox.clear();
+        for (int i = 0; i < inventario.length; i++) {
+          await tempBox.put('inventario_$i', inventario[i]);
+        }
+
+        // Recargar inventario
+        setState(() {
+          _inventarioFuture = _loadInventarioCompleto();
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('✅ Inventario cargado: ${inventario.length} productos')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ Error al cargar CSV: $e')),
+      );
+    }
+  }
+
   Future<void> _exportarRegistros(BuildContext context, String formato) async {
     final box = Hive.box<Registro>('registros');
     if (box.isEmpty) {
@@ -540,6 +638,7 @@ class _HomePageState extends State<HomePage> {
                         switch (result) {
                           case 'modificar': _mostrarListaRegistros(context); break;
                           case 'exportar_csv': _exportarRegistros(context, 'csv'); break;
+                          case 'cargar_csv': _cargarInventarioCSV(context); break;
                         }
                       },
                       itemBuilder: (context) => [
@@ -557,6 +656,14 @@ class _HomePageState extends State<HomePage> {
                             const Icon(Icons.table_chart, size: 18),
                             const SizedBox(width: 10),
                             Text('Exportar a CSV', style: const TextStyle(color: Colors.black)),
+                          ]),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'cargar_csv',
+                          child: Row(children: [
+                            const Icon(Icons.upload_file, size: 18),
+                            const SizedBox(width: 10),
+                            Text('Cargar Inventario CSV', style: const TextStyle(color: Colors.black)),
                           ]),
                         ),
                       ],
