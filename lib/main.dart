@@ -535,6 +535,76 @@ class _HomePageState extends State<HomePage> {
           return;
         }
 
+        // Mostrar diálogo de vista previa
+        bool confirmar = false;
+        await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) {
+            return AlertDialog(
+              title: const Text('Vista Previa del Inventario'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Se van a cargar ${inventario.length} productos.',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '⚠️ El inventario actual será reemplazado.',
+                      style: const TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: inventario.length,
+                        itemBuilder: (_, idx) {
+                          final prod = inventario[idx];
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: ListTile(
+                              title: Text(
+                                '${prod['nombre']} (${prod['id']})',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                '${prod['categoria']} - ${prod['linea']}\nColores: ${(prod['colores'] as List).join(', ')}\nTallas: ${(prod['tallas'] as List).join(', ')}',
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    confirmar = true;
+                    Navigator.pop(ctx);
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  child: const Text('Cargar Inventario', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (!confirmar) {
+          return;
+        }
+
         // Guardar inventario en Hive: limpiar inventario previo y guardar por id
         final tempBox = Hive.box('temp_productos');
         await tempBox.clear();
