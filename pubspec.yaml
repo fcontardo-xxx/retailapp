@@ -16,6 +16,7 @@ dependencies:
   open_filex: ^4.5.4
   csv: ^6.0.0
   uuid: ^4.5.0  # ✅ Para generar ID único
+  file_picker: ^6.0.0
   flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:

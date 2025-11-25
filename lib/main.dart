@@ -10,6 +10,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:csv/csv.dart';
 import 'models/registro.dart';
 import 'package:uuid/uuid.dart';
+import 'package:file_picker/file_picker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
