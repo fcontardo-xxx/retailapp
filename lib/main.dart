@@ -101,10 +101,32 @@ class _HomePageState extends State<HomePage> {
     final List<dynamic> inventarioBase = jsonDecode(data).cast<Map<String, dynamic>>();
     final tempBox = Hive.box('temp_productos');
     final List<dynamic> tempProducts = [];
-    tempBox.keys.forEach((key) {
+    for (var key in tempBox.keys) {
       tempProducts.add(tempBox.get(key));
-    });
-    return [...inventarioBase, ...tempProducts];
+    }
+
+    // If a CSV-based inventory exists in the temp box, prefer it and ignore the bundled JSON.
+    // Also deduplicate by 'id' to avoid multiple DropdownMenuItems with the same value.
+    if (tempProducts.isNotEmpty) {
+      final Map<String, Map<String, dynamic>> byId = {};
+      for (var p in tempProducts) {
+        try {
+          final id = (p['id'] ?? '').toString();
+          if (id.isNotEmpty) byId[id] = Map<String, dynamic>.from(p as Map);
+        } catch (_) {}
+      }
+      return byId.values.toList();
+    }
+
+    // Fallback to bundled JSON, but deduplicate there as well.
+    final Map<String, Map<String, dynamic>> byIdBase = {};
+    for (var p in inventarioBase) {
+      try {
+        final id = (p['id'] ?? '').toString();
+        if (id.isNotEmpty) byIdBase[id] = Map<String, dynamic>.from(p as Map);
+      } catch (_) {}
+    }
+    return byIdBase.values.toList();
   }
 
   void _onProductoChanged(String? value, List<dynamic> inventario) {
